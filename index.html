@@ -4,9 +4,10 @@
 
 </style>
 </head>
-<body onkeydown="move(event);" background = "br.png;">
+<body onkeydown="move(event);" background = "br.png">
   <img id="player1" src="BB8.png" style="position:absolute;left:0px;top:0px;" />
   <img id="player2" src="r2d2.jpg" style="position:absolute;left:100px;top:0px;" /> 
+  <div id="worlds-list"></div>
   <script>
   var bb8 = document.getElementById("player1");
   var r2d2 = document.getElementById("player2");
@@ -59,15 +60,15 @@
         up(r2d2);
         break;
 
-      case 83: // s
+      case 83: // s - down
         down(r2d2);
         break;
 
-      case 65: // a
+      case 65: // a - left
         left(r2d2);
         break; 
       
-      case 68: // d
+      case 68: // d - right
         right(r2d2);
         break;
     }
@@ -88,5 +89,37 @@
   setInterval("moveNpc()", 500);
 
   </script>
+
+  <script src="https://cdn.firebase.com/js/client/2.3.1/firebase.js"></script>
+  <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/3.10.1/lodash.min.js"></script>
+
+  <script type="text/javascript">
+
+  var worldsUrl = "https://shining-torch-8736.firebaseio.com/worlds";
+
+  var worldsRef = new Firebase(worldsUrl);
+  var myWorldRef = new Firebase(worldsUrl + "/droids");
+
+  myWorldRef.set(
+     {
+       name: "Droids",
+       worldUrl: "http://"
+     }
+  );
+
+  var worlds = {};
+
+  worldsRef.on("child_added", function(data) {
+   worlds[data.key()] = data.val();
+   updateWorlds();
+  });
+
+  function updateWorlds(){
+   $('#worlds-list').html(_.map(worlds, function(world){return world.name + "<br/>"}));
+  }
+  </script>
+
+
 </body>
 </html>
