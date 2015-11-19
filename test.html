@@ -1,0 +1,20 @@
+<html>
+<head>
+<style>
+
+</style>
+</head>
+<body onkeydown="keypressed(event);">
+
+<script>
+var stuff =["ipod","dog","penguin"];
+var i = 0;
+function keypressed(event){
+	console.log(event.which);
+	alert(stuff[i]);
+	i = i + 1;
+	if(i == 3){i = 0;}
+}
+</script>
+</body>
+</html>
