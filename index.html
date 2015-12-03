@@ -42,7 +42,9 @@
   }
 
   function spin(character){
-
+    for(var i = 0; i<360; i++){
+      character.style.transform = "rotate(" + i + "deg)";  
+    }
   }
 
   function move(e){
@@ -71,6 +73,10 @@
         rotate(bb8);
         break;
 
+      case 13: // space bar 
+        spin(bb8);
+        break;
+
       // R2D2
       case 87: // w - up
         up(r2d2);
@@ -95,11 +101,11 @@
   }
   
   function getRandom(min, max) {
-    return Math.random() * (max - min) + min;
+    return Math.floor(Math.random() * (max - min)) + min;
   }
   
   function moveNpc(){
-    switch (getRandom(0,4)){
+    switch (getRandom(0,6)){
       case 0:
         left(ewok);
         break;
@@ -121,7 +127,7 @@
     }
   }
   
-  setInterval("moveNpc()", 100);
+  setInterval(moveNpc, 100);
 
   </script>
 
