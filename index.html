@@ -5,13 +5,19 @@
 </style>
 </head>
 <body onkeydown="move(event);" >
-  <img id="player1" src="BB8.png" style="position:absolute;left:0px;top:0px;" />
-  <img id="player2" src="r2d2.jpg" style="position:absolute;left:100px;top:0px;" /> 
- <img id="npc" src="123.png" style "position:absolute;left:100px;top:0px;"/>  <div id="worlds-list"></div>
+  <img id="bb8" src="BB8.png" style="position:absolute;left:0px;top:0px;" />
+  <img id="r2d2" src="r2d2.jpg" style="position:absolute;left:100px;top:0px;" /> 
+  <img id="ewok" src="ewok.png" style="position:absolute;left:100px;top:0px;"/>
   <script>
-  var bb8 = document.getElementById("player1");
-  var r2d2 = document.getElementById("player2");
-  var rotation = 0;
+  var bb8 = document.getElementById("bb8");
+  var r2d2 = document.getElementById("r2d2");
+  var ewok = document.getElementById("ewok");
+
+  function center(character){
+    character.style.top = window.innerHeight/2 - parseInt(character.height, 10);
+    character.style.left = window.innerWidth/2 - parseInt(character.width, 10);
+  }
+  center(ewok);  
 
   function up(character){
     character.style.top = parseInt(character.style.top, 10) - 10;
@@ -29,7 +35,18 @@
     character.style.left = parseInt(character.style.left, 10) + 10;
   }
 
+  var rotation = 0;
+  function rotate(character){
+    rotation = rotation + 10;
+    character.style.transform = "rotate(" + rotation + "deg)";
+  }
+
+  function spin(character){
+
+  }
+
   function move(e){
+    e.preventDefault();
     console.log(e.which);  
     switch(e.which){
 
@@ -51,8 +68,7 @@
         break;
       
       case 32: // space bar 
-        rotation = rotation + 10;
-        bb8.style.transform = "rotate(" + rotation + "deg)";
+        rotate(bb8);
         break;
 
       // R2D2
@@ -71,22 +87,41 @@
       case 68: // d - right
         right(r2d2);
         break;
+
+      case 82:
+        rotate(r2d2);
+        break;
     }
   }
   
-  function randomInt(max){
-    return;
+  function getRandom(min, max) {
+    return Math.random() * (max - min) + min;
   }
   
   function moveNpc(){
-    var direction = randomInt(4);
-    switch (direction){
+    switch (getRandom(0,4)){
       case 0:
-      left(npc);
+        left(ewok);
+        break;
+      case 1:
+        right(ewok);
+        break;
+      case 2:
+        up(ewok);
+        break;
+      case 3:
+        down(ewok);
+        break;
+      case 4:
+        rotate(ewok);
+        break;
+      case 5:
+        spin(ewok);
+        break;
     }
   }
   
-  setInterval("moveNpc()", 500);
+  setInterval("moveNpc()", 100);
 
   </script>
 
