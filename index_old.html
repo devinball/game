@@ -1,0 +1,166 @@
+<html>
+<head>
+<style>
+
+</style>
+</head>
+<body onkeydown="move(event);" >
+  <img id="bb8" src="BB8.png" style="position:absolute;left:0px;top:0px;" />
+  <img id="r2d2" src="r2d2.jpg" style="position:absolute;left:100px;top:0px;" /> 
+  <img id="ewok" src="ewok.png" style="position:absolute;left:100px;top:0px;"/>
+  <script>
+  var bb8 = document.getElementById("bb8");
+  var r2d2 = document.getElementById("r2d2");
+  var ewok = document.getElementById("ewok");
+
+  function center(character){
+    character.style.top = window.innerHeight/2 - parseInt(character.height, 10);
+    character.style.left = window.innerWidth/2 - parseInt(character.width, 10);
+  }
+  center(ewok);  
+
+  function up(character){
+    character.style.top = parseInt(character.style.top, 10) - 10;
+  }
+
+  function left(character){
+    character.style.left = parseInt(character.style.left, 10) - 10;
+  }
+
+  function down(character){
+    character.style.top = parseInt(character.style.top, 10) + 10;
+  }
+
+  function right(character){
+    character.style.left = parseInt(character.style.left, 10) + 10;
+  }
+
+  var rotation = 0;
+  function rotate(character){
+    rotation = rotation + 10;
+    character.style.transform = "rotate(" + rotation + "deg)";
+  }
+
+  function spin(character){
+    for(var i = 0; i<360; i++){
+      character.style.transform = "rotate(" + i + "deg)";  
+    }
+  }
+
+  function move(e){
+    e.preventDefault();
+    console.log(e.which);  
+    switch(e.which){
+
+      // BB8
+      case 38: // up arrow
+        up(bb8);
+        break;
+
+      case 40: // down arrow
+        down(bb8);
+        break;
+
+      case 37: // left arrow
+        left(bb8);
+        break;
+      
+      case 39: // right arrow
+        right(bb8);
+        break;
+      
+      case 32: // space bar 
+        rotate(bb8);
+        break;
+
+      case 13: // space bar 
+        spin(bb8);
+        break;
+
+      // R2D2
+      case 87: // w - up
+        up(r2d2);
+        break;
+
+      case 83: // s - down
+        down(r2d2);
+        break;
+
+      case 65: // a - left
+        left(r2d2);
+        break; 
+      
+      case 68: // d - right
+        right(r2d2);
+        break;
+
+      case 82:
+        rotate(r2d2);
+        break;
+    }
+  }
+  
+  function getRandom(min, max) {
+    return Math.floor(Math.random() * (max - min)) + min;
+  }
+  
+  function moveNpc(){
+    switch (getRandom(0,6)){
+      case 0:
+        left(ewok);
+        break;
+      case 1:
+        right(ewok);
+        break;
+      case 2:
+        up(ewok);
+        break;
+      case 3:
+        down(ewok);
+        break;
+      case 4:
+        rotate(ewok);
+        break;
+      case 5:
+        spin(ewok);
+        break;
+    }
+  }
+  
+  setInterval(moveNpc, 100);
+
+  </script>
+
+  <script src="https://cdn.firebase.com/js/client/2.3.1/firebase.js"></script>
+  <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/3.10.1/lodash.min.js"></script>
+
+  <script type="text/javascript">
+
+  var worldsUrl = "https://shining-torch-8736.firebaseio.com/worlds";
+
+  var worldsRef = new Firebase(worldsUrl);
+  var myWorldRef = new Firebase(worldsUrl + "/droids");
+
+  myWorldRef.set(
+     {
+       name: "Droids",
+       worldUrl: "http://"
+     }
+  );
+
+  var worlds = {};
+
+  worldsRef.on("child_added", function(data) {
+   worlds[data.key()] = data.val();
+   updateWorlds();
+  });
+
+  function updateWorlds(){
+   $('#worlds-list').html(_.map(worlds, function(world){return world.name + "<br/>"}));
+  }
+  </script>
+
+
+</body>
+</html>

@@ -1,166 +1,63 @@
+<!Doctype>
 <html>
-<head>
-<style>
-
-</style>
-</head>
-<body onkeydown="move(event);" >
-  <img id="bb8" src="BB8.png" style="position:absolute;left:0px;top:0px;" />
-  <img id="r2d2" src="r2d2.jpg" style="position:absolute;left:100px;top:0px;" /> 
-  <img id="ewok" src="ewok.png" style="position:absolute;left:100px;top:0px;"/>
-  <script>
-  var bb8 = document.getElementById("bb8");
-  var r2d2 = document.getElementById("r2d2");
-  var ewok = document.getElementById("ewok");
-
-  function center(character){
-    character.style.top = window.innerHeight/2 - parseInt(character.height, 10);
-    character.style.left = window.innerWidth/2 - parseInt(character.width, 10);
-  }
-  center(ewok);  
-
-  function up(character){
-    character.style.top = parseInt(character.style.top, 10) - 10;
-  }
-
-  function left(character){
-    character.style.left = parseInt(character.style.left, 10) - 10;
-  }
-
-  function down(character){
-    character.style.top = parseInt(character.style.top, 10) + 10;
-  }
-
-  function right(character){
-    character.style.left = parseInt(character.style.left, 10) + 10;
-  }
-
-  var rotation = 0;
-  function rotate(character){
-    rotation = rotation + 10;
-    character.style.transform = "rotate(" + rotation + "deg)";
-  }
-
-  function spin(character){
-    for(var i = 0; i<360; i++){
-      character.style.transform = "rotate(" + i + "deg)";  
-    }
-  }
-
-  function move(e){
-    e.preventDefault();
-    console.log(e.which);  
-    switch(e.which){
-
-      // BB8
-      case 38: // up arrow
-        up(bb8);
-        break;
-
-      case 40: // down arrow
-        down(bb8);
-        break;
-
-      case 37: // left arrow
-        left(bb8);
-        break;
-      
-      case 39: // right arrow
-        right(bb8);
-        break;
-      
-      case 32: // space bar 
-        rotate(bb8);
-        break;
-
-      case 13: // space bar 
-        spin(bb8);
-        break;
-
-      // R2D2
-      case 87: // w - up
-        up(r2d2);
-        break;
-
-      case 83: // s - down
-        down(r2d2);
-        break;
-
-      case 65: // a - left
-        left(r2d2);
-        break; 
-      
-      case 68: // d - right
-        right(r2d2);
-        break;
-
-      case 82:
-        rotate(r2d2);
-        break;
-    }
-  }
-  
-  function getRandom(min, max) {
-    return Math.floor(Math.random() * (max - min)) + min;
-  }
-  
-  function moveNpc(){
-    switch (getRandom(0,6)){
-      case 0:
-        left(ewok);
-        break;
-      case 1:
-        right(ewok);
-        break;
-      case 2:
-        up(ewok);
-        break;
-      case 3:
-        down(ewok);
-        break;
-      case 4:
-        rotate(ewok);
-        break;
-      case 5:
-        spin(ewok);
-        break;
-    }
-  }
-  
-  setInterval(moveNpc, 100);
-
-  </script>
-
-  <script src="https://cdn.firebase.com/js/client/2.3.1/firebase.js"></script>
   <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/3.10.1/lodash.min.js"></script>
+  <script src="https://cdn.firebase.com/js/client/2.3.1/firebase.js"></script>
+  <script src="https://s3-us-west-2.amazonaws.com/cachemakers/bundle.js"></script>
 
-  <script type="text/javascript">
+  <script>
 
-  var worldsUrl = "https://shining-torch-8736.firebaseio.com/worlds";
+  $(document).ready(function(){
 
-  var worldsRef = new Firebase(worldsUrl);
-  var myWorldRef = new Firebase(worldsUrl + "/droids");
+    var playerFunctions = []; //Array to store all of our player functions
 
-  myWorldRef.set(
-     {
-       name: "Droids",
-       worldUrl: "http://"
-     }
-  );
 
-  var worlds = {};
+    var teleport = function(player, world){ //Write a funciton to let you explore other worlds!
+      var left = player.playerRef.css('left');
+      var top = player.playerRef.css('top');
 
-  worldsRef.on("child_added", function(data) {
-   worlds[data.key()] = data.val();
-   updateWorlds();
+      if(parseInt(left) < 0) world.ChangeWorld('left');
+      else if(parseInt(left) > $('body').width()) world.changeWorld('right');
+      else if(parseInt(top) < 0) world.ChangeWorld('top');
+      else if(parseInt(top) > $('body').width()) world.changeWorld('bottom');
+    }
+
+    var movePlayer = function(player, key){ //Function to move player
+      var left = player.css('left');
+      var top = player.css('top');
+      if(key == 37)player.css('left', parseInt(left) - 10);
+      if(key == 39)player.css('left', parseInt(left) + 10);
+      if(key == 38)player.css('top', parseInt(top) - 10);
+      if(key == 40)player.css('top', parseInt(top) + 10);
+    }
+
+
+
+
+    playerFunctions[0] = function(player, world){ //Add move function to array of player functions
+      $('body').keydown(function(e){ //When key gets pressed
+        movePlayer(player.playerRef, e.which); //move the player
+        teleport(player, world);
+      });
+    }
+
+
+
+
+  var neighborWorlds = {     //Worlds I want to be my neighbors
+  'top':'http://google.com',
+  'bottom':'http://google.com',
+  'left':'http://waiter-passage-15428.bitballoon.com/?&id=fluffenberry',
+  'right':'http://google.com'};
+
+    var myName = 'devin';
+    var world = new World(neighborWorlds, myName);
+
+    world.Init(playerFunctions);
+
   });
-
-  function updateWorlds(){
-   $('#worlds-list').html(_.map(worlds, function(world){return world.name + "<br/>"}));
-  }
   </script>
-
-
-</body>
+  <body>
+    <!-- img ID must be the same as the name you passed to your world -->
+    <img src="BB8.png" id="devin" class="cacheMakersPlayer" style="left:100px; top:100px; position:absolute;"
+  </body>
 </html>
